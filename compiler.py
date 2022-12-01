@@ -18,7 +18,8 @@ tokens = [
 ]
 tokens.extend(reserved.values())
 
-literals = ['=', '+', '-', ';', '(', ')', '{', '}']
+literals = ['=', '+', '-', '^', '/', '*' ';', '(', ')', '{', '}']
+operators = ['=', '+', '-', '^', '/', '*']
 
 # Tokens
 
@@ -170,7 +171,11 @@ def p_expression_group(p):
 
 def p_expression_binop(p):
     '''expression : expression '+' expression
-                  | expression '-' expression'''
+                  | expression '-' expression
+                  | expression '^' expression
+                  | expression '/' expression
+                  | expression '*' expression'''
+
     if p[2] == '+':
         n = Node()
         n.type = '+'
@@ -183,6 +188,24 @@ def p_expression_binop(p):
         n.childrens.append(p[1])
         n.childrens.append(p[3])
         p[0] = n
+    elif p[2] == '^':
+        n = Node()
+        n.type = '^'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[1] = n
+    elif p[2] == '/':
+        n = Node()
+        n.type = '/'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[1] = n
+    elif p[2] == '*':
+        n = Node()
+        n.type = '*'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[1] = n
     
 
 
@@ -250,7 +273,13 @@ def genTAC(node):
         print(node.childrens[0].val  + " := " + genTAC(node.childrens[1]) )
     elif ( node.type == "INUMBER"):
         return str(node.val)
-    elif ( node.type == "+"):
+    elif ( node.type == "BOOLVAL"):
+        return str(node.val)
+    elif ( node.type == "FNUMBER"):
+        return str(node.val)
+    elif (node.type == "ID"):
+        return str(node.val)
+    elif ( node.type in operators):
         tempVar = "t" + str(varCounter)
         varCounter = varCounter +1
         print( tempVar + " := " + genTAC(node.childrens[0]) + " + " + genTAC(node.childrens[1]))

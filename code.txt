@@ -5,6 +5,6 @@ varB = 2;
 if(true){
     int b;
     b = 3;
-    print varA + varB;
+    print varA;
 }
 print b;
