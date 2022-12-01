@@ -28,7 +28,7 @@ tokens = [
 ]
 tokens.extend(reserved.values())
 
-literals = ['=', '+', '-', '^', '/', '*' ';', '(', ')', '{', '}']
+literals = ['=', '+', '-', '^', '/', '*', ';', '(', ')', '{', '}']
 operators = ['=', '+', '-', '^', '/', '*']
 
 # Tokens
@@ -136,7 +136,7 @@ def p_dcl_declare_int(p):
         p[0] = n2
 
 def p_statement_declare_float(p):
-    ''''statement : FLOATDCL NAME ";"
+    '''statement : FLOATDCL NAME ";"
                  | FLOATDCL NAME "=" expression ";" '''
    
     if (len(p) == 4):
@@ -310,48 +310,23 @@ def p_expression_fnumber(p):
     p[0] = n
 
 
-def p_expression_boolval(p):
-    "expression : boolexp"
-    p[0] = p[1]
+def p_expression_compare(p):
+    '''boolexp : expression GREATER expression
+                  | expression LESSER expression
+                  | expression MOREEQUAL expression
+                  | expression LESSEQUAL expression
+                  | expression EQUAL expression
+                  | expression NOTEQUAL expression'''
 
-def p_bool_expression(p):
-    '''boolexp : BOOLVAL
-                | boolexp AND boolexp
-                | boolexp OR boolexp
-                | expression EQUAL expression
-                | expression NOTEQUAL expression
-                | numexp MOREEQUAL numexp
-                | numexp LESSEQUAL numexp'
-                | numexp GREATER numexp
-                | numexp LESSER numexp'''
- 
-
-    if len(p) == 2:
+    if p[2] == '>':
         n = Node()
-        n.type = 'BOOLVAL'
-        n.val = (p[1] == 'true')
-        p[0] = n
-    elif p[2] == 'and':
-        n = Node()
-        n.type = 'AND'
+        n.type = '>'
         n.childrens.append(p[1])
         n.childrens.append(p[3])
         p[0] = n
-    elif p[2] == 'or':
+    elif p[2] == '<':
         n = Node()
-        n.type = 'OR'
-        n.childrens.append(p[1])
-        n.childrens.append(p[3])
-        p[0] = n
-    elif p[2] == '==':
-        n = Node()
-        n.type = '=='
-        n.childrens.append(p[1])
-        n.childrens.append(p[3])
-        p[0] = n
-    elif p[2] == '!=':
-        n = Node()
-        n.type = '!='
+        n.type = '<'
         n.childrens.append(p[1])
         n.childrens.append(p[3])
         p[0] = n
@@ -367,28 +342,18 @@ def p_bool_expression(p):
         n.childrens.append(p[1])
         n.childrens.append(p[3])
         p[0] = n
-    elif p[2] == '>':
+    elif p[2] == '==':
         n = Node()
-        n.type = '>'
+        n.type = '=='
         n.childrens.append(p[1])
         n.childrens.append(p[3])
         p[0] = n
-    elif p[2] == '<':
+    elif p[2] == '!=':
         n = Node()
-        n.type = '<'
+        n.type = '!='
         n.childrens.append(p[1])
         n.childrens.append(p[3])
         p[0] = n
-
-def p_expression_name(p):
-    "expression : NAME"
-    if p[1] in symbolsTable["table"]:
-        n = Node()
-        n.type = 'ID'
-        n.val = p[1]
-        p[0] = n
-
-
 
 def p_error(p):
     if p:
