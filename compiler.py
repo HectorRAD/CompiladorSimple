@@ -9,7 +9,15 @@ reserved = {
     "true": "BOOLVAL",
     "false": "BOOLVAL",
     "if": "IF",
-    "else": "ELSE"
+    "else": "ELSE",
+    "and": "AND",
+    "or": "OR",
+    ">": "GREATER",
+    "<": "LESSER",
+    "<=": "LESSEQUAL",
+    ">=": "MOREEQUAL",
+    "==": "EQUAL",
+    "!=": "NOTEQUAL"
 }
 
 
@@ -231,12 +239,70 @@ def p_expression_boolval(p):
     p[0] = p[1]
 
 def p_bool_expression(p):
-    "boolexp : BOOLVAL"
-    n = Node()
-    n.type = 'BOOLVAL'
-    n.val = (p[1] == 'true')
-    p[0] = n
+    '''boolexp : BOOLVAL
+                | boolexp AND boolexp
+                | boolexp OR boolexp
+                | expression EQUAL expression
+                | expression NOTEQUAL expression
+                | numexp MOREEQUAL numexp
+                | numexp LESSEQUAL numexp'
+                | numexp GREATER numexp
+                | numexp LESSER numexp'''
+ 
 
+    if len(p) == 2:
+        n = Node()
+        n.type = 'BOOLVAL'
+        n.val = (p[1] == 'true')
+        p[0] = n
+    elif p[2] == 'and':
+        n = Node()
+        n.type = 'AND'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == 'or':
+        n = Node()
+        n.type = 'OR'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == '==':
+        n = Node()
+        n.type = '=='
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == '!=':
+        n = Node()
+        n.type = '!='
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == '>=':
+        n = Node()
+        n.type = '>='
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == '<=':
+        n = Node()
+        n.type = '<='
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == '>':
+        n = Node()
+        n.type = '>'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == '<':
+        n = Node()
+        n.type = '<'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
 
 def p_expression_name(p):
     "expression : NAME"
