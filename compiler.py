@@ -193,19 +193,19 @@ def p_expression_binop(p):
         n.type = '^'
         n.childrens.append(p[1])
         n.childrens.append(p[3])
-        p[1] = n
+        p[0] = n
     elif p[2] == '/':
         n = Node()
         n.type = '/'
         n.childrens.append(p[1])
         n.childrens.append(p[3])
-        p[1] = n
+        p[0] = n
     elif p[2] == '*':
         n = Node()
         n.type = '*'
         n.childrens.append(p[1])
         n.childrens.append(p[3])
-        p[1] = n
+        p[0] = n
     
 
 
