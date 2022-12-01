@@ -160,9 +160,9 @@ def p_statement_declare_float(p):
 def p_statement_declare_bool(p):
     '''statement : BOOLDCL NAME ";"
                  | BOOLDCL NAME "=" boolexp ";" '''
-        
+
     if (len(p) == 4):
-        symbolsTable["table"][p[2]] = { "type": "BOOLEAN", "value": False }
+        symbolsTable["table"][p[2]] = { "type": "BOOL", "value": False }
         n = Node()
         n.type = "BOOL_DLC"
         n.val = p[2]
@@ -203,23 +203,6 @@ def p_statement_for(p):
     n.childrens.extend(p[9])
     p[0] = n
 
-def p_expression_boolop(p):
-    '''boolexp : boolexp AND boolexp
-               | boolexp OR boolexp'''
-
-    if p[2] == 'and':
-        n = Node()
-        n.type = 'and'
-        n.childrens.append(p[1])
-        n.childrens.append(p[3])
-        p[0] = n
-    elif p[2] == 'or':
-        n = Node()
-        n.type = 'or'
-        n.childrens.append(p[1])
-        n.childrens.append(p[3])
-        p[0] = n
-
 def p_statement_if(p):
     'statement : IF "(" boolexp ")" "{" stmts "}"'
     n = Node()
@@ -229,6 +212,22 @@ def p_statement_if(p):
     n.childrens.append(p[3])
     n.childrens.append(n2)
     p[0] = n
+
+def p_statement_if_else(p):
+    'statement : IF "(" boolexp ")" "{" stmts "}" ELSE "{" stmts "}"'
+    n = Node()
+    n.type = 'IF'
+    n2 = Node()
+    n2.childrens = p[6]
+    n3 = Node()
+    n3.type = 'ELSE'
+    n3.childrens = p[10]
+    n.childrens.append(p[3])
+    n.childrens.append(n2)
+    n.childrens.append(n3)
+    p[0] = n
+
+
 
 def p_statement_assign(p):
     'statement : NAME "=" expression ";"'
@@ -291,7 +290,22 @@ def p_expression_binop(p):
         n.childrens.append(p[3])
         p[0] = n
     
+def p_expression_boolop(p):
+    '''boolexp : boolexp AND boolexp
+               | boolexp OR boolexp'''
 
+    if p[2] == 'and':
+        n = Node()
+        n.type = 'and'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == 'or':
+        n = Node()
+        n.type = 'or'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
 
 def p_expression_inumber(p):
     "expression : INUMBER"
@@ -307,6 +321,17 @@ def p_expression_fnumber(p):
     n = Node()
     n.type = 'FNUMBER'
     n.val = float(p[1])
+    p[0] = n
+
+def p_expression_boolval(p):
+    "expression : boolexp"
+    p[0] = p[1]
+
+def p_bool_expression(p):
+    "boolexp : BOOLVAL"
+    n = Node()
+    n.type = 'BOOLVAL'
+    n.val = (p[1] == 'true')
     p[0] = n
 
 
@@ -392,6 +417,11 @@ def genTAC(node):
         print( tempVar + " := " + genTAC(node.childrens[0]) + " + " + genTAC(node.childrens[1]))
         return tempVar
     elif ( node.type in ["and", "or"] ):
+        tempVar = "t" + str(varCounter)
+        varCounter = varCounter +1
+        print( tempVar + " := " + genTAC(node.childrens[0]) + " " + node.type + " " + genTAC(node.childrens[1]))
+        return tempVar
+    elif ( node.type in [">", "<", ">=", "<=", "==", "!="] ):
         tempVar = "t" + str(varCounter)
         varCounter = varCounter +1
         print( tempVar + " := " + genTAC(node.childrens[0]) + " " + node.type + " " + genTAC(node.childrens[1]))

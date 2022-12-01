@@ -1,10 +1,6 @@
-int varA;
-int varB;
-varA = 1;
-varB = 2;
-if(true){
-    int b;
-    b = 3;
-    print varA;
+int a=(5*3);
+a=3-1;
+boolean b=true;
+if(true or false){
+a=1;
 }
-print b;
