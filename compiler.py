@@ -8,6 +8,7 @@ reserved = {
     "boolean": "BOOLDCL",
     "true": "BOOLVAL",
     "false": "BOOLVAL",
+    "while": "WHILE",
     "if": "IF",
     "else": "ELSE",
     "and": "AND",
@@ -182,6 +183,31 @@ def p_statement_print(p):
     n.type = 'PRINT'
     n.childrens.append(p[2])
     p[0] = n
+
+def p_statement_while(p):
+    '''statement : WHILE "(" boolexp ")" "{" stmts "}" '''
+    n = Node()
+    n.type = "WHILE"
+    n.childrens.append(p[3])
+    n.childrens.extend(p[6])
+    p[0] = n
+
+def p_expression_boolop(p):
+    '''boolexp : boolexp AND boolexp
+               | boolexp OR boolexp'''
+
+    if p[2] == 'and':
+        n = Node()
+        n.type = 'and'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
+    elif p[2] == 'or':
+        n = Node()
+        n.type = 'or'
+        n.childrens.append(p[1])
+        n.childrens.append(p[3])
+        p[0] = n
 
 def p_statement_if(p):
     'statement : IF "(" boolexp ")" "{" stmts "}"'
@@ -388,6 +414,11 @@ def genTAC(node):
         tempVar = "t" + str(varCounter)
         varCounter = varCounter +1
         print( tempVar + " := " + genTAC(node.childrens[0]) + " + " + genTAC(node.childrens[1]))
+        return tempVar
+    elif ( node.type in ["and", "or"] ):
+        tempVar = "t" + str(varCounter)
+        varCounter = varCounter +1
+        print( tempVar + " := " + genTAC(node.childrens[0]) + " " + node.type + " " + genTAC(node.childrens[1]))
         return tempVar
     elif ( node.type == "PRINT"):
         print( "PRINT " + genTAC(node.childrens[0]))
